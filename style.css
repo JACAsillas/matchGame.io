@@ -40,13 +40,14 @@ body{
   border-color: black;
 }
 .message{
+  font-size: 10px;
   margin: 0 auto;
   text-align: center;
   border-style: dashed;
   border-color: black;
   border-radius: 5px;
-  height: 15px;
-  width: 115px;
+  height: 25px;
+  width: 215px;
   padding: 1px;
   color: goldenrod;
 }

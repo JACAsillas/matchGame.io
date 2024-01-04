@@ -1,20 +1,30 @@
 let regArray = ["cat","dog","hamster","canary","pig","horse","sheep","cow",
                         "wolf","lion","bear","shark","ant","fly","wasp","spider"];
+let startTime;
+let endTime;
+let difference = endTime-startTime;
 var stack = [];
 var attemptStadck = [];
 var onOff = [true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true]
 var tries = 4;
-var colorWheel = ["brown","orange","purple","black"];
-var colorIndex =- 0;
-// checks for winner function
-function stackEnabled(index){
-  stack = [];
-  for (let x =0; x<16;x++){if(onOff[x]){stack.push(x.toString())}}
-  return stack[index];
+var colorWheel = ["brown","orange","purple","blue","pink"];
+var colorIndex = 0;
+//deletes an element of a stack at a given index
+function deleteStackText(text){
+  let index = 0;
+  for(let x = 0;x<attemptStadck.length;x++){if(attemptStadck[x]===(text)){index=x}}
+  attemptStadck.splice(index,0);
 }
-function disableButtons() {
-  for(let x =0;x<4;x++){document.getElementById(stackEnabled(x)).disabled = false;document.getElementById(stackEnabled(x)).style.backgroundColor = colorWheel[colorIndex]}
+// printsStack on console
+function printConsoleStack(){
+  for (let x =0; x<attemptStadck.length;x++){console.log(attemptStadck[x])}
 }
+//Function to Clear the last 4 elements of stack, the current selected will keep original stack but it will not keep the win status
+function popLastFour(){
+  attemptStadck.splice(0,4);
+}
+
+// checks for winner
 let correct = function (){
   if(attemptStadck.includes("cat")&&attemptStadck.includes("dog")&&attemptStadck.includes("hamster")&&attemptStadck.includes("canary")){ return true}
   if(attemptStadck.includes("pig")&&attemptStadck.includes("horse")&&attemptStadck.includes("sheep")&&attemptStadck.includes("cow")){ return true}
@@ -22,24 +32,19 @@ let correct = function (){
   if(attemptStadck.includes("ant")&&attemptStadck.includes("fly")&&attemptStadck.includes("wasp")&&attemptStadck.includes("spider")){ return true}
   else {return false}
 }
-// Clean Button
-function clearAll(){
-  for (let x =0;x<=16;x++){document.getElementById(x.toString()).style.backgroundColor = "#08052b"}
+//return message on loss or win
+function userMessage(){
+  let message = "";
+  if(attemptStadck.includes("cat")&&attemptStadck.includes("dog")&&attemptStadck.includes("hamster")&&attemptStadck.includes("canary")){ message="Correct, the category is house pets"}
+  else if(attemptStadck.includes("pig")&&attemptStadck.includes("horse")&&attemptStadck.includes("sheep")&&attemptStadck.includes("cow")){message = "Correct, the category is farm animals"}
+  else if(attemptStadck.includes("wolf")&&attemptStadck.includes("lion")&&attemptStadck.includes("bear")&&attemptStadck.includes("shark")){ message = "Correct, the category is wild animals"}
+  else if(attemptStadck.includes("ant")&&attemptStadck.includes("fly")&&attemptStadck.includes("wasp")&&attemptStadck.includes("spider")){ message = "Correct, the category is insects"}
+  else {message = "Sorry, try again"}
+    return message;
 }
-//stack print function
-function stackPrint(stack=[]) {
-  let stackLinePrint = "";
-  for (let x = 0;x<stack.length;x++){stackLinePrint=stackLinePrint+" ,"+stack[x]}
-  return stackLinePrint;
-}
-//stack clean function
-function stackClear(stack = []){
-   while (stack.length>0){
-     stack.pop();
-   }
-}
-var randomStack = function (index){
 
+//Rando Stack Generator
+var randomStack = function (index){
   while(stack.length<16){
     let num =Math.round(Math.random()*15);
     if(!stack.includes(num)){stack.push(num);}
@@ -48,7 +53,7 @@ var randomStack = function (index){
 }
   //Start Button Event
 document.getElementById("startBtn").onclick = function (){
-
+  startTime = new Date();
   for(let x = 0; x<16; x++ ){
     document.getElementById(x.toString()).innerHTML = regArray[randomStack(x)];
   }
@@ -57,20 +62,22 @@ document.getElementById("startBtn").onclick = function (){
 //Summit Button
 document.getElementById("summitBtn").onclick = function () {
   console.log(correct(attemptStadck));
-  let message;
+  console.log(userMessage());
+  if(correct()){colorIndex++; document.getElementById("message1").innerHTML = userMessage();popLastFour();}
+  else {document.getElementById("message1").innerHTML = userMessage()}
+  if(colorIndex>=4){endTime = new Date(); console.log("Time dif is "+difference);
+                    document.getElementById("tableBorder").style.borderStyle = "Solid";
+    document.getElementById("tableBorder").style.borderColor = "gold" ;
 
-  if(correct(attemptStadck)){message="You got one right!!!!"; disableButtons() ;colorIndex++;console.log("you are right!!!") }
-  else{ message = "Wrong, try again :( "; stackClear(attemptStadck);clearAll();}
-  document.getElementById("message1").innerHTML = message;
-
-  console.log("summit/clear");
+    document.getElementById("startBtn").innerHTML="You won!!!"}
 }
 // Method for Input Set up
 function wordButton(id,index){
   item = document.getElementById(id).innerHTML.toString();
   if(onOff[index]) {document.getElementById(id).style.backgroundColor = colorWheel[colorIndex]; console.log("if statement"); onOff[index]=false; attemptStadck.push(item);tries++}
-  else{document.getElementById(id).style.backgroundColor = "#08052b"; attemptStadck.pop(); onOff[index]=true; console.log("else statement");tries-- }
-
+  else{document.getElementById(id).style.backgroundColor = "#08052b"; attemptStadck.pop(); onOff[index]=true; console.log("else statement");deleteStackText(item);tries-- }
+    printConsoleStack();
+  if(colorIndex>=4){document.getElementById(id).disabled = true; console.log("time dif is "+ startTime.getSeconds())}
 }
 //16 button set up
 /*1*/document.getElementById("0").onclick = function (){ wordButton("0",0)};
